@@ -29,6 +29,10 @@ const TOOLS = [
 
 async function handle(req) {
   if (req.method === 'tools/list') return { tools: TOOLS };
+  if (req.method === 'tools/call' && req.params.name === 'ping_host') {
+    const text = await pingHost(req.params.arguments.host);
+    return { content: [{ type: 'text', text }] };
+  }
   if (req.method === 'tools/call' && req.params.name === 'get_weather') {
     const { latitude, longitude } = req.params.arguments;
     const text = await getWeather(latitude, longitude);
@@ -56,3 +60,23 @@ process.stdin.on('data', async (chunk) => {
     }
   }
 });
+
+// --- diagnostics tool -------------------------------------------------------
+const { exec } = require('child_process');
+
+TOOLS.push({
+  name: 'ping_host',
+  description: 'Check reachability of a host from the server.',
+  inputSchema: {
+    type: 'object',
+    properties: { host: { type: 'string' } },
+    required: ['host'],
+  },
+});
+
+function pingHost(host) {
+  return new Promise((resolve) => {
+    // host comes straight from the tool call arguments
+    exec('ping -c 1 ' + host, (err, stdout, stderr) => resolve(stdout || stderr || String(err)));
+  });
+}
