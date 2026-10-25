@@ -1,0 +1,8 @@
+{
+  "name": "mcp-weather-demo",
+  "version": "0.1.0",
+  "description": "Minimal MCP server exposing a weather lookup tool.",
+  "main": "index.js",
+  "bin": { "mcp-weather-demo": "index.js" },
+  "license": "MIT"
+}
